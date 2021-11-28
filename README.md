@@ -7,7 +7,8 @@
 ## References
 [1] Bocharova, Irina E., Boris D. Kudryashov, and Rolf Johannesson. "Searching for binary and nonbinary block and convolutional LDPC codes." IEEE Transactions on Information Theory 62.1 (2015): 163-183.
 
-#Folder: trapping-sets-enumeration
+## Misc.
+* Folder: trapping-sets-enumeration
 	1) Enumerate trapping sets
 	2) Convert .alist file into .sparse file
 	3) Convert .qc file into sparse file
