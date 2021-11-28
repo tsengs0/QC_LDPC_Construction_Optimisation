@@ -53,6 +53,7 @@ void QC_Graph::traversal_cycleGenerate_tree(_U32 prev_node, _U32 node_id, _U32 d
 _U32 QC_Graph::construct_cycleGenerate_tree(TreeNode *curNode, _U32 prev_node, _U32 node_id, _U32 depth, _U32 traversedNode_cnt)
 {
 	_U32 temp; temp = traversedNode_cnt;
+	if(node_id == 1) return temp;
 
 	if(depth <= half_girth) {
 		_U32 edge_cnt; edge_cnt = 0;
@@ -95,13 +96,17 @@ _U32 QC_Graph::construct_cycleGenerate_tree(TreeNode *curNode, _U32 prev_node, _
 	return temp;
 }
 
-void QC_Graph::traversal_cycleGenerate_tree(TreeNode *curNode)
+void QC_Graph::traversal_cycleGenerate_tree(TreeNode *curNode, _U32 depth)
 {
 	cout << curNode -> node_number << " -> ";
 	for(_U32 i = 0; i<curNode -> next.size(); i++) {
-		traversal_cycleGenerate_tree(&(curNode -> next[i]));		
+		if(i != 0) {
+			for(_U32 j=0; j<depth+1; j++)
+				cout << "     ";
+		}	
+		traversal_cycleGenerate_tree(&(curNode -> next[i]), depth+1);
 	}
-	cout << endl;
+	cout << endl;	
 }
 
 TreeNode::TreeNode()

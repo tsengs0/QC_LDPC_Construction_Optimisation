@@ -41,7 +41,7 @@ class QC_Graph {
 		//void construct_cycleGenerate_tree(_U32 prev_node, _U32 node_id, _U32 depth);
 		_U32 construct_cycleGenerate_tree(TreeNode *curNode, _U32 prev_node, _U32 node_id, _U32 depth, _U32 traversedNode_cnt);
 		//void traversal_cycleGenerate_tree(_U32 prev_node, _U32 node_id, _U32 depth);
-		void traversal_cycleGenerate_tree(TreeNode *curNode);
+		void traversal_cycleGenerate_tree(TreeNode *curNode, _U32 depth);
 };
 
 #endif // __QC_GRAPH_H

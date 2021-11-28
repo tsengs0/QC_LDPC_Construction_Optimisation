@@ -38,10 +38,11 @@ int main(int argc, char **argv)
 	_U32 traversedNode_cnt;
 	QC_Graph qc(8, 4, 1, 3, 9, &g);
 	//qc.base_graph.graph_matrix -> DFS(1);
-	traversedNode_cnt = qc.construct_cycleGenerate_tree(&(qc.cycleGenerate_tree), 0, 1, 0, 0);
+	traversedNode_cnt = qc.construct_cycleGenerate_tree(&(qc.cycleGenerate_tree), 0, 2, 0, 0);
 	cout << "=======================================" << endl << "Number of node in the tree: " << traversedNode_cnt << endl;
 	//qc.traversal_cycleGenerate_tree(0, 1, 0);
-	qc.traversal_cycleGenerate_tree(&(qc.cycleGenerate_tree));
+	qc.traversal_cycleGenerate_tree(&(qc.cycleGenerate_tree), 0);
+	/*
 	cout << "=======================================" << endl;
 	cout << "(Node_" << qc.cycleGenerate_tree.node_number << ").size: " << qc.cycleGenerate_tree.next.size() << endl;
 	cout << "(Node_" << qc.cycleGenerate_tree.next[0].node_number << ").size: " << qc.cycleGenerate_tree.next[0].next.size() << endl;
@@ -73,7 +74,7 @@ int main(int argc, char **argv)
 	cout << "(Node_" << qc.cycleGenerate_tree.next[2].next[0].next[0].next[1].node_number << ").size: " << qc.cycleGenerate_tree.next[2].next[0].next[0].next[1].next.size() << endl;
 	cout << "(Node_" << qc.cycleGenerate_tree.next[2].next[1].next[0].next[0].node_number << ").size: " << qc.cycleGenerate_tree.next[2].next[1].next[0].next[0].next.size() << endl;
 	cout << "(Node_" << qc.cycleGenerate_tree.next[2].next[1].next[0].next[1].node_number << ").size: " << qc.cycleGenerate_tree.next[2].next[1].next[0].next[1].next.size() << endl;
-
+	*/
 
 	cout << endl;
 	return 0;
