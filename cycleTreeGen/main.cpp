@@ -13,15 +13,15 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	Graph g;
-	g.addEdge(1-1, 5-1, 1);
-	g.addEdge(1-1, 6-1, 2);
-	g.addEdge(1-1, 7-1, 3);
-	g.addEdge(2-1, 5-1, 4);
-	g.addEdge(2-1, 6-1, 5);
-	g.addEdge(3-1, 6-1, 6);
-	g.addEdge(3-1, 7-1, 7);
-	g.addEdge(4-1, 5-1, 8);
-	g.addEdge(4-1, 7-1, 9);
+	g.addEdge(1-1, 5-1,  1);
+	g.addEdge(1-1, 6-1,  2);
+	g.addEdge(1-1, 7-1,  3);
+	g.addEdge(2-1, 5-1,  4);
+	g.addEdge(2-1, 6-1,  5);
+	g.addEdge(3-1, 6-1,  6);
+	g.addEdge(3-1, 7-1,  7);
+	g.addEdge(4-1, 5-1,  8);
+	g.addEdge(4-1, 7-1,  9);
 	g.addEdge(5-1, 1-1, -1);
 	g.addEdge(5-1, 2-1, -4);
 	g.addEdge(5-1, 4-1, -8);
@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 		4, //N_t, 
 		1, //K_t, 
 		3, //M_t, 
+		9, // the number of nonzero element on the base graph
 		9, //lift_degree_t, 
 		&g //*base_graph_t
 	);
@@ -52,8 +53,16 @@ int main(int argc, char **argv)
 		cout << "3-Tuple formed Table of Cycle Generating Tree " << var_node+1 << endl;
 		cout << "-------------------" << endl;
 		qc.cycleTree_3tuple_table[var_node].showTable();
-		cout << "-------------------" << endl;
+		cout << "The number of entries: " << qc.cycleTree_3tuple_table[var_node].num << endl
+		     << "-------------------" << endl;
+		qc.build_cycleCandidate_list(var_node);
+		qc.cycleCandidatePair_list[var_node].showTable();
+		cout << "The number of entries: " << qc.cycleCandidatePair_list[var_node].num << endl
+		     << "-------------------" << endl;
+		 qc.build_weightCoefficientMatrix(var_node);
 	}
+
+	cout << endl << endl;
 
 	cout << endl;
 	return 0;
