@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	//g.DFS(1);
 	
 	QC_Graph qc(
-		8, //target_girth_t, 
+		14, //target_girth_t, 
 		4, //N_t, 
 		1, //K_t, 
 		3, //M_t, 
@@ -45,6 +45,7 @@ int main(int argc, char **argv)
 		&g //*base_graph_t
 	);
 
+	qc.init_weightCoefficientMatrix();
 	for(_U32 var_node=0; var_node<qc.base_graph.N; var_node++) {
 		qc.construct_cycleGenerate_tree(var_node, &(qc.cycleGenerate_tree[var_node]), 0, var_node, 0, 0); // the node number starts counting from one
 		cout << "=======================================" << endl << "Number of node in the tree: " << qc.cycelTree_nodeNum[var_node] << endl;
@@ -60,6 +61,13 @@ int main(int argc, char **argv)
 		cout << "The number of entries: " << qc.cycleCandidatePair_list[var_node].num << endl
 		     << "-------------------" << endl;
 		 qc.build_weightCoefficientMatrix(var_node);
+	}
+
+	
+	for(_U32 len=1; len<qc.half_girth-2+1; len++) {
+		cout << "======================" <<endl;
+		cout << endl << "A(" << (len+1)*2 << "):" << endl;
+		qc.weightCoefficientMatrix[len-1].showMatrix();
 	}
 
 	cout << endl << endl;

@@ -86,6 +86,7 @@ class QC_Graph {
 		void assign_serialNumber(_U32 rootNode);
 		void traversal_cycleGenerate_tree(TreeNode *curNode, _U32 depth);
 		void build_cycleCandidate_list(_U32 rootNode);
+		void init_weightCoefficientMatrix();
 		void build_weightCoefficientMatrix(_U32 rootNode);
 };
 #endif // __QC_GRAPH_H

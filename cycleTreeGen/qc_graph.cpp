@@ -62,9 +62,9 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
     node_num_cuDepth = root_ptr -> next.size();
 
     _U32 node_cnt; node_cnt = 1; 
-
+    _U32 cnt, local_start, local_end; cnt=node_num_cuDepth;
+    local_start = 0; local_end = local_end+cnt-1;
     TreeNode **child_nodes = new TreeNode* [node_num_cuDepth]; // create the branch pointer for all child nodes
-    long long **parent_entryID, **parent_entryID_local; parent_entryID = new long long* [node_num_cuDepth];
     for(_U32 i=0; i<node_num_cuDepth; i++) {
     	child_nodes[i] = &(root_ptr -> next[i]);
 
@@ -76,22 +76,13 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
     		root_ptr,
     		-1
     	);
-
-    	parent_entryID[i] = new long long[ child_nodes[i] -> next.size() ];
-    	for(_U32 temp=0; temp<child_nodes[i] -> next.size(); temp++) parent_entryID[i][temp] = cycleTree_3tuple_table[rootNode].num-1;
     }
 
+    _U32 entry, local_cnt; local_cnt=0; entry=local_start;
+    _U32 prev_entry, prev_t;
     for(_U32 depth=0; depth<half_girth; depth++) {
     	_U32 node_num_nextDepth; node_num_nextDepth=0; 
-
-		_U32 precal_branch_num; precal_branch_num=0;
-		for(_U32 i=0; i<node_num_cuDepth; i++)
-			for(_U32 branch_id=0; branch_id<child_branch_num; branch_id++)
-				precal_branch_num += 1;
-		parent_entryID_local = new long long* [precal_branch_num];
-
     	// Assigning the serial number to current parent node
-    	precal_branch_num=0;
     	for(_U32 i=0; i<node_num_cuDepth; i++) {
     		child_nodes[i] -> serial_number = node_cnt++;
     		node_num_nextDepth += child_nodes[i] -> next.size();
@@ -99,23 +90,24 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
     		// To build the cycle-generating tree table
     		if(depth != half_girth-1) { // the leaf nodes are excluded since there is no associated terminating node
     			_U32 child_branch_num = child_nodes[i] -> next.size();
-    			_U32 temp_cnt; temp_cnt=0;
-    			precal_branch_num[precal_branch_num] = new long long[child_branch_num];
     			for(_U32 branch_id=0; branch_id<child_branch_num; branch_id++) {
     				int vol = base_graph.graph_matrix -> getVoltage(child_nodes[i]->node_number, child_nodes[i]->next[branch_id].node_number);
+    				entry = (local_cnt == 0) ? local_start : (child_nodes[i] -> serial_number == prev_t) ? prev_entry : entry+1;
     				cycleTree_3tuple_table[rootNode].insertCycleTreeTupleTable( 
     					child_nodes[i] -> serial_number, 
     					vol,
     					child_nodes[i] -> next[branch_id].node_number,
     					child_nodes[i],
-    					parent_entryID[i][branch_id]
+    					entry
     				);
-    				precal_branch_num[precal_branch_num][branch_id] = cycleTree_3tuple_table[rootNode].num-1;
-    				precal_branch_num += 1;
+
+    				prev_t = child_nodes[i] -> serial_number; prev_entry = entry;
+    				local_start += 1; local_cnt += 1;
+    				local_end = local_start+local_cnt-1;
     			}
     		}
     	}
-    	
+
     	TreeNode **temp = new TreeNode* [node_num_nextDepth];
     	node_num_nextDepth = 0;
     	for(_U32 i=0; i<node_num_cuDepth; i++) {
@@ -126,16 +118,11 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
     		node_num_nextDepth += branch_num_temp;
     	}
 
-    	parent_entryID = new _U32* [node_num_nextDepth];
+
     	node_num_cuDepth = node_num_nextDepth;
     	delete [] child_nodes;
     	child_nodes = new TreeNode* [node_num_cuDepth];
-    	for(_U32 i=0; i<node_num_cuDepth; i++) {
-    		parent_entryID[i] = new _U32[ temp[i] -> next.size() ];
-    		for(_U32 temp = 0; temp<temp[i] -> next.size(); temp++)
-
-    		child_nodes[i] = temp[i];
-    	}
+    	for(_U32 i=0; i<node_num_cuDepth; i++) child_nodes[i] = temp[i];
     }
 }
 
@@ -164,9 +151,8 @@ void QC_Graph::build_cycleCandidate_list(_U32 rootNode)
 	}
 }
 
-void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
+void QC_Graph::init_weightCoefficientMatrix()
 {
-	/*
 	_U32 vector_col_num, length_search_num;
 	vector_col_num = base_graph.nonzero_num;
 	length_search_num = half_girth-2; // the length-2 does not exist
@@ -175,57 +161,51 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 		weightCoefficientMatrix[len_id].col_num = vector_col_num;
 		weightCoefficientMatrix[len_id].cycle_length = (len_id+2)*2;
 	}
+}
+
+void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
+{
+	_U32 vector_col_num, length_search_num;
+	vector_col_num = base_graph.nonzero_num;
+	length_search_num = half_girth-2; // the length-2 does not exist
 
 	_U32 cycleCandidate_num = cycleCandidatePair_list[rootNode].num;
 	for(_U32 entry_id=0; entry_id<cycleCandidate_num; entry_id++) {
-		_U32 len_cnt, ji, jh; len_cnt=1;
+		long long len_cnt, ji, jh; len_cnt=0;
 		int *vector_temp = new int[vector_col_num]();
 		ji = cycleCandidatePair_list[rootNode].candidate[entry_id].ji;
 		jh = cycleCandidatePair_list[rootNode].candidate[entry_id].jh;
 
 		// Backtracking from ji
-		int entry_ptr, prev_ptr; entry_ptr = ji; prev_ptr = 900000; // dummy value
-		while(!(entry_ptr == -1)) {
-			cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].v << "->";
+		long long entry_ptr_ji; entry_ptr_ji = ji;
+		while(entry_ptr_ji != -1) {
+			//cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].v << "->";
 			// voltage_index starts from 1 in order to avoid confusion of +0 and -0
-			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].e;
+			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].e;
 			vector_temp[abs(vol_t)-1] += (vol_t/abs(vol_t));
-		 	_U32 dummy; dummy = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].t;
-			prev_ptr = entry_ptr;
-			entry_ptr = dummy-1;//(dummy == 0) ? 0 : dummy-1;
-			
+			entry_ptr_ji = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].parent_entryID;		
 			len_cnt += 1; 
-			//cout << "len_cnt: " << len_cnt << endl;
 		}
-		cout << endl;
-		for(int aaa=0; aaa<vector_col_num; aaa++) cout << "["<< aaa <<"]:" << vector_temp[aaa] << "\t"; cout << endl;
-		cout << "\n------------------------------" << endl;
+		//cout << endl;
 		// Backtracking from jh
-		entry_ptr = jh; prev_ptr = 900000; // dummy value
-		while(!(entry_ptr == -1)) {
-			 //cout << "@" << entry_ptr << endl;
-			cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].v << "->";
-			 //cout << "!" << entry_ptr << endl;
+		long long entry_ptr_jh = jh;
+		while(!(entry_ptr_jh == -1 || entry_ptr_ji == entry_ptr_jh)) {
+			//cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].v << "->";
 			// voltage_index starts from 1 in order to avoid confusion of +0 and -0
-			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].e;
-			 //cout << "?" << entry_ptr << endl;
+			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].e;
 			vector_temp[abs(vol_t)-1] -= (vol_t/abs(vol_t));
-			 //cout << "@" << entry_ptr << endl;
-			_U32 dummy; dummy = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr].t;
-			 //cout << "#" << entry_ptr << endl;
-			prev_ptr = entry_ptr;
-			entry_ptr = dummy-1;//(dummy == 0) ? 0 : dummy-1;
-			
-			 //cout << "*" << entry_ptr << endl;
+			entry_ptr_jh = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].parent_entryID;		
 			len_cnt += 1;
-			//cout << "len_cnt: " << len_cnt << endl;
 		}
-		cout << endl;
-		for(int aaa=0; aaa<vector_col_num; aaa++) cout << "["<< aaa <<"]:" << vector_temp[aaa] << "\t"; cout << endl;
-		cout << "len_cnt:" << len_cnt << ", index: " << (len_cnt/2)-2 << endl;
+		//cout << endl;
+		len_cnt=0;
+		for(_U32 vector_id=0; vector_id<vector_col_num; vector_id++) {
+			len_cnt = (vector_temp[vector_id] != 0) ? len_cnt+1 : len_cnt;
+		}
 		weightCoefficientMatrix[(len_cnt/2)-2].insert_vector(vector_temp, vector_col_num);
+		//cout << "Cycle.Candidate_" << entry_id << ", len_cnt:" << len_cnt << ", index: " << (len_cnt/2)-2 << endl;
+		//cout << "\n------------------------------" << endl;
 	}
-	*/
 }
 
 TreeNode::TreeNode()
@@ -249,17 +229,6 @@ void CycleTree_3tuple_table::insertCycleTreeTupleTable(_U32 t, int e, _U32 v, Tr
 { 
 	tuple_3.push_back({t, e, v, parent, parent_entryID});
 	num += 1;
-}
-
-_U32 CycleTree_3tuple_table::entryQuery(_U32 t, _U32 v)
-{
-	_U32 cnt; cnt=0;
-	while(1) {
-		if(tuple_3.t == t && tuple_3.v == v)
-			return cnt;
-		else
-			cnt += 1;
-	}
 }
 
 bool CycleTree_3tuple_table::isEqual_entries(_U32 ji, _U32 jh)
@@ -310,5 +279,12 @@ void WeightCoefficientMatrix::remove_redundancy(_U32 base_vector_id)
 
 void WeightCoefficientMatrix::showMatrix()
 {
-
+	for(_U32 vec_id=0; vec_id<acc_voltage_vector.size(); vec_id++) {
+		for(_U32 col_id=0; col_id<col_num; col_id++) {
+			cout << acc_voltage_vector[vec_id][col_id] << "\t";
+		}
+		cout << endl;
+	}
+	cout << "======================"
+		 << endl;
 }
