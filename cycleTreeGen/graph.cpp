@@ -13,8 +13,7 @@ void Graph::DFS(int v)
 {
 	visited[v] = true;
 	cout << v << " ";
-	//if(edge_voltage[v].size() != 0) cout << " (" << edge_voltage[v][edge_cnt] << ") ";
-	
+
 	// Recur for all the vertices adjacent to vertex v
 	list<int>::iterator i;
 	
@@ -22,4 +21,20 @@ void Graph::DFS(int v)
 		if (!visited[*i])
 			DFS(*i);	
 	}
+}
+
+int Graph::getVoltage(int source_node, int sink_node)
+{
+    // to find the edge order with right terminating point
+    unsigned int list_cnt; list<int>::iterator i; list_cnt = 0;
+	int vol;
+	for (i = adj[source_node].begin(); i != adj[source_node].end(); ++i) {
+		if((*i) == sink_node) {
+			vol = edge_voltage[source_node][list_cnt];
+			break;
+		}
+		list_cnt += 1;
+	}
+
+    return vol;
 }

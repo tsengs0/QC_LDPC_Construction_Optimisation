@@ -21,6 +21,7 @@ class Graph
 		// DFS traversal of the vertices
 		// reachable from v
 		void DFS(int v);
+		int getVoltage(int source_node, int sink_node);
 };
 
 #endif // __GRAPH_H
