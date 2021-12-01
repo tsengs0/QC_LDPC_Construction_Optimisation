@@ -8,7 +8,7 @@
 
 
 ## References
-[1] Bocharova, Irina E., Boris D. Kudryashov, and Rolf Johannesson. "Searching for binary and nonbinary block and convolutional LDPC codes." IEEE Transactions on Information Theory 62.1 (2015): 163-183.
+[1] Bocharova, Irina E., Boris D. Kudryashov, and Rolf Johannesson. "Searching for binary and nonbinary block and convolutional LDPC codes." IEEE Transactions on Information Theory 62.1 (2015): 163-183.\
 [2] Sułek, Wojciech. "Protograph based low-density parity-check codes design with mixed integer linear programming." IEEE Access 7 (2018): 1424-1438.
 
 ## Misc.
