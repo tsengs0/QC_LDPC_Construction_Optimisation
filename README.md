@@ -1,7 +1,9 @@
 
 *A construction of QC-LDPC codes using Integer Linear Programming.*
-## Work to be done (latest update: 27 Nov., 2021)
+## Work to be done (latest update: 30 Nov., 2021)
 - [x] A BFS-like searching to generate Cycle Generating Tree for each base graph column [1].
+- [x] To summarise the Cycle Generating Trees to a) 3-tuple formed tables and b) cycle cnadidate-pairs matrices.
+- [x] To create the weighting coefficents matrices, i.e., A_{l} for all l <= g/2 and even. 
 
 
 ## References
