@@ -1,5 +1,6 @@
 
-*A construction of QC-LDPC codes using Integer Linear Programming.*
+*A construction of QC-LDPC codes using Integer Linear Programming. It is an exercise mainly attempting to reproduce the work in [1] and [2]*
+
 ## Work to be done (latest update: 30 Nov., 2021)
 - [x] A BFS-like searching to generate Cycle Generating Tree for each base graph column [1].
 - [x] To summarise the Cycle Generating Trees to a) 3-tuple formed tables and b) cycle cnadidate-pairs matrices.
@@ -8,6 +9,7 @@
 
 ## References
 [1] Bocharova, Irina E., Boris D. Kudryashov, and Rolf Johannesson. "Searching for binary and nonbinary block and convolutional LDPC codes." IEEE Transactions on Information Theory 62.1 (2015): 163-183.
+[2] Sułek, Wojciech. "Protograph based low-density parity-check codes design with mixed integer linear programming." IEEE Access 7 (2018): 1424-1438.
 
 ## Misc.
 * Folder: trapping-sets-enumeration
