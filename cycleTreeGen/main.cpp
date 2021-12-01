@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <string>
+#include <sstream>
 #include "graph.h"
 #include "qc_graph.h"
 
@@ -12,6 +14,35 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+    int upperGirth = 8;
+    string INPUT_FILENAME = "";
+    string OUTPUT_FILENAME = "out.txt";
+    if(argc != 7) {
+    	cerr << "Usage:\ncycleTreeGen -file graphIn.txt -out out.txt(default) -upperGirth 8(default)\n";
+   		exit(1);
+    }
+    
+    for (int i = 1; i + 1 < argc; ++i) {
+        if (string(argv[i]) == "-file") {
+            INPUT_FILENAME = argv[i + 1];
+            ++i;
+            continue;
+        }
+        if (string(argv[i]) == "-out") {
+            OUTPUT_FILENAME = argv[i + 1];
+            ++i;
+            continue;
+        }
+        if (string(argv[i]) == "-upperGirth") {
+            string strDep = argv[i + 1];
+            stringstream sstrDep(strDep);
+            sstrDep >> upperGirth;
+            ++i;
+            continue;
+        }
+    }
+
+
 	Graph g;
 	g.addEdge(1-1, 5-1,  1);
 	g.addEdge(1-1, 6-1,  2);
@@ -36,7 +67,7 @@ int main(int argc, char **argv)
 	//g.DFS(1);
 	
 	QC_Graph qc(
-		14, //target_girth_t, 
+		(_U32) upperGirth, //target_girth_t, 
 		4, //N_t, 
 		1, //K_t, 
 		3, //M_t, 
@@ -64,9 +95,11 @@ int main(int argc, char **argv)
 	}
 
 	
-	for(_U32 len=1; len<qc.half_girth-2+1; len++) {
+	for(_U32 len=1; len<qc.half_girth-1+1; len++) {
+		qc.weightCoefficientMatrix[len-1].remove_redundancy_all();
 		cout << "======================" <<endl;
-		cout << endl << "A(" << (len+1)*2 << "):" << endl;
+		cout << endl << "A(" << (len+1)*2 << "), Number of voltage vectors:"
+			 << qc.weightCoefficientMatrix[len-1].num << endl;
 		qc.weightCoefficientMatrix[len-1].showMatrix();
 	}
 

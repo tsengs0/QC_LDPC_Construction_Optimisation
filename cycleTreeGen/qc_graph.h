@@ -67,7 +67,13 @@ class WeightCoefficientMatrix {
 		std::vector< std::vector<int> > acc_voltage_vector;
 		WeightCoefficientMatrix();
 		void insert_vector(int *vec_in, _U32 vec_num);
-		void remove_redundancy(_U32 base_vector_id);
+		_U32 length_cal(_U32 vector_id); // row ID
+		bool mismatch_check(_U32 base_vector_id);
+		void mismatch_check_all();
+		bool isExist(int *vec_0, int *vec_1);
+		bool isExist_all(int *vec_in);
+		bool remove_redundancy(_U32 base_vector_id);
+		void remove_redundancy_all();
 		void showMatrix();
 };
 

@@ -62,8 +62,11 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
     node_num_cuDepth = root_ptr -> next.size();
 
     _U32 node_cnt; node_cnt = 1; 
-    _U32 cnt, local_start, local_end; cnt=node_num_cuDepth;
-    local_start = 0; local_end = local_end+cnt-1;
+    _U32 local_start;
+    //_U32 local_end; 
+    //_U32 cnt; cnt=node_num_cuDepth;
+    local_start = 0; 
+    //local_end = 0;//local_start+cnt-1;
     TreeNode **child_nodes = new TreeNode* [node_num_cuDepth]; // create the branch pointer for all child nodes
     for(_U32 i=0; i<node_num_cuDepth; i++) {
     	child_nodes[i] = &(root_ptr -> next[i]);
@@ -103,7 +106,7 @@ void QC_Graph::assign_serialNumber(_U32 rootNode)
 
     				prev_t = child_nodes[i] -> serial_number; prev_entry = entry;
     				local_start += 1; local_cnt += 1;
-    				local_end = local_start+local_cnt-1;
+    				//local_end = local_start+local_cnt-1;
     			}
     		}
     	}
@@ -155,7 +158,7 @@ void QC_Graph::init_weightCoefficientMatrix()
 {
 	_U32 vector_col_num, length_search_num;
 	vector_col_num = base_graph.nonzero_num;
-	length_search_num = half_girth-2; // the length-2 does not exist
+	length_search_num = half_girth-1; // the length-2 does not exist
 	weightCoefficientMatrix = new WeightCoefficientMatrix[length_search_num];
 	for(_U32 len_id=0; len_id<length_search_num;len_id++) {
 		weightCoefficientMatrix[len_id].col_num = vector_col_num;
@@ -165,9 +168,8 @@ void QC_Graph::init_weightCoefficientMatrix()
 
 void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 {
-	_U32 vector_col_num, length_search_num;
+	_U32 vector_col_num;
 	vector_col_num = base_graph.nonzero_num;
-	length_search_num = half_girth-2; // the length-2 does not exist
 
 	_U32 cycleCandidate_num = cycleCandidatePair_list[rootNode].num;
 	for(_U32 entry_id=0; entry_id<cycleCandidate_num; entry_id++) {
@@ -184,7 +186,6 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].e;
 			vector_temp[abs(vol_t)-1] += (vol_t/abs(vol_t));
 			entry_ptr_ji = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].parent_entryID;		
-			len_cnt += 1; 
 		}
 		//cout << endl;
 		// Backtracking from jh
@@ -195,14 +196,17 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].e;
 			vector_temp[abs(vol_t)-1] -= (vol_t/abs(vol_t));
 			entry_ptr_jh = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].parent_entryID;		
-			len_cnt += 1;
 		}
-		//cout << endl;
+	
 		len_cnt=0;
-		for(_U32 vector_id=0; vector_id<vector_col_num; vector_id++) {
-			len_cnt = (vector_temp[vector_id] != 0) ? len_cnt+1 : len_cnt;
+		for(_U32 col_id=0; col_id<vector_col_num; col_id++) {
+			len_cnt = (vector_temp[col_id] != 0) ? len_cnt+abs(vector_temp[col_id]) : len_cnt;
 		}
-		weightCoefficientMatrix[(len_cnt/2)-2].insert_vector(vector_temp, vector_col_num);
+		
+		cout << "Matrix_row." << entry_id << "  len_cnt: " << len_cnt << endl;
+		weightCoefficientMatrix[(len_cnt/2)-2].showMatrix();
+		if(weightCoefficientMatrix[(len_cnt/2)-2].isExist_all(vector_temp) == false)
+			weightCoefficientMatrix[(len_cnt/2)-2].insert_vector(vector_temp, vector_col_num);
 		//cout << "Cycle.Candidate_" << entry_id << ", len_cnt:" << len_cnt << ", index: " << (len_cnt/2)-2 << endl;
 		//cout << "\n------------------------------" << endl;
 	}
@@ -270,16 +274,164 @@ void WeightCoefficientMatrix::insert_vector(int *vec_in, _U32 vec_num)
 	for(_U32 vec_id=0; vec_id<vec_num; vec_id++)
 		temp.push_back(vec_in[vec_id]);
 	acc_voltage_vector.push_back(temp);
+	num += 1;
 }
 
-void WeightCoefficientMatrix::remove_redundancy(_U32 base_vector_id)
+_U32 WeightCoefficientMatrix::length_cal(_U32 vector_id)
 {
+	_U32 len_acc; len_acc=0;
+	for(_U32 col_id=0; col_id<col_num; col_id++)
+		len_acc += abs(acc_voltage_vector[vector_id][col_id]);
+	return len_acc;
+}
 
+// To check if the incoming vector exists in the matrix
+bool WeightCoefficientMatrix::isExist(int *vec_0, int *vec_1)
+{
+	/*
+	bool isIdentical; isIdentical=false;
+	for(_U32 col_id=0; col_id<col_num; col_id++) {
+		if(abs(vec_in[col_id]) != abs(acc_voltage_vector[vector_id][col_id])) 
+			return false;
+		else 
+			isIdentical = true;
+	}
+	return isIdentical;
+	*/
+	return 0;
+}
+
+bool WeightCoefficientMatrix::isExist_all(int *vec_in)
+{
+	bool isIdentical; isIdentical=false;
+	for(_U32 vector_id=0; vector_id<num; vector_id++) {
+		for(_U32 col_id=0; col_id<col_num; col_id++) {
+			if(abs(vec_in[col_id]) != abs(acc_voltage_vector[vector_id][col_id])) 
+				return false;
+			else 
+				isIdentical = true;
+		}
+
+		if(isIdentical == true) break;
+	}
+
+	return isIdentical;
+}
+
+bool WeightCoefficientMatrix::remove_redundancy(_U32 base_vector_id)
+{
+	_U32 index_cnt; index_cnt = 0;
+	std::vector< std::vector<int> > unremoved_matrix;
+
+	// At first, to keep the referenced vector
+	unremoved_matrix.push_back(acc_voltage_vector[base_vector_id]);
+
+	bool isDirty = false;
+	while(index_cnt < num) {
+		if(index_cnt != base_vector_id) {
+			//bool isIdentical; isIdentical = false;
+			for(_U32 col_id=0; col_id<col_num; col_id++) {
+				if(
+					abs(acc_voltage_vector[index_cnt][col_id]) != 
+					abs(acc_voltage_vector[base_vector_id][col_id])
+				) {
+					//isIdentical = false;
+					unremoved_matrix.push_back(acc_voltage_vector[index_cnt]);
+					break;
+				}
+				//else
+					//isIdentical = true;
+			}
+
+			//if(isIdentical == true)
+				//removed_indices.push_back(index_cnt);	
+		}
+
+		index_cnt += 1;
+	}
+
+	isDirty = (acc_voltage_vector.size() == unremoved_matrix.size()) ? false : true;
+	acc_voltage_vector.swap(unremoved_matrix);
+	std::vector< std::vector<int> >().swap(unremoved_matrix);
+	return isDirty;
+}
+
+void WeightCoefficientMatrix::remove_redundancy_all()
+{
+	_U32 id; id = 0;
+	bool isDirty;
+	do {
+		isDirty = remove_redundancy(id);
+		id = (isDirty == true) ? 0 : id+1;
+		//cout << "updated id: " << id << endl;
+		//showMatrix();
+		num = acc_voltage_vector.size();
+	}while( id != (acc_voltage_vector.size()-1) );
+}
+
+bool WeightCoefficientMatrix::mismatch_check(_U32 base_vector_id)
+{
+	/*
+	_U32 index_cnt; index_cnt = 0;
+	std::vector< std::vector<int> > unremoved_matrix;
+
+	// At first, to keep the referenced vector
+	unremoved_matrix.push_back(acc_voltage_vector[base_vector_id]);
+
+	_U32 curLen;
+	bool isDirty = false;
+	while(index_cnt < num) {
+		if(index_cnt != base_vector_id) {
+			curLen = length_cal(index_cnt);
+
+			/////////////////////////////////////////////////////////
+			//bool isIdentical; isIdentical = false;
+			for(_U32 col_id=0; col_id<col_num; col_id++) {
+				if(
+					abs(acc_voltage_vector[index_cnt][col_id]) != 
+					abs(acc_voltage_vector[base_vector_id][col_id])
+				) {
+					//isIdentical = false;
+					unremoved_matrix.push_back(acc_voltage_vector[index_cnt]);
+					break;
+				}
+				//else
+					//isIdentical = true;
+			}
+			/////////////////////////////////////////////////////////////
+			//if(isIdentical == true)
+				//removed_indices.push_back(index_cnt);	
+		}
+
+		index_cnt += 1;
+	}
+
+	isDirty = (acc_voltage_vector.size() == unremoved_matrix.size()) ? false : true;
+	acc_voltage_vector.swap(unremoved_matrix);
+	std::vector< std::vector<int> >().swap(unremoved_matrix);
+	return isDirty;
+	*/
+	return 0;
+}
+
+void WeightCoefficientMatrix::mismatch_check_all()
+{
+	/*
+	_U32 id; id = 0;
+	bool isDirty;
+	do {
+		isDirty = remove_redundancy(id);
+		id = (isDirty == true) ? 0 : id+1;
+		//cout << "updated id: " << id << endl;
+		//showMatrix();
+		num = acc_voltage_vector.size();
+	}while( id != (acc_voltage_vector.size()-1) );
+	*/
 }
 
 void WeightCoefficientMatrix::showMatrix()
 {
-	for(_U32 vec_id=0; vec_id<acc_voltage_vector.size(); vec_id++) {
+	for(_U32 vec_id=0; vec_id<num; vec_id++) {
 		for(_U32 col_id=0; col_id<col_num; col_id++) {
 			cout << acc_voltage_vector[vec_id][col_id] << "\t";
 		}
