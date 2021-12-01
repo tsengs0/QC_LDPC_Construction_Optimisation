@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS= -O0 -std=c++11 -g -lm -Wall -pedantic
+CXXFLAGS= -O0 -std=c++11 -lm -Wall -pedantic #-g
 
 EXE_NAME=cycleTreeGen
 # STATIC_LIB_NAME := libdramsim.a

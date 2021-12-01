@@ -165,7 +165,7 @@ void QC_Graph::init_weightCoefficientMatrix()
 		weightCoefficientMatrix[len_id].cycle_length = (len_id+2)*2;
 
 		char outFilename[100];
-		sprintf(outFilename, "weight_matrices/weightMatrix_%d.csv", weightCoefficientMatrix[len_id].cycle_length);
+		sprintf(outFilename, "weight_matrices/weightMatrix.len_%d.csv", weightCoefficientMatrix[len_id].cycle_length);
 		weightCoefficientMatrix[len_id].weightCoefficientMatrix_fd.open(outFilename);
 	}
 }
