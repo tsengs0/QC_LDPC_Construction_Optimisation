@@ -31,10 +31,8 @@ run:
 	./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 10
 
 debug:
-	gdb ./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 8
+	gdb ./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 10
 
 clean: 
 	rm -f $(REBUILDABLES) *.dep *.deppo *~ *.o *.txt circular_page_align*_lib.v page_align*_lib.v log submatrix*.mem
-	rm submatrix_col_*
-	rm submatrix_*_vn_to_mem.mem
-	rm log
+	rm weight_matrices/*.csv

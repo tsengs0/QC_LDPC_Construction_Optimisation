@@ -163,6 +163,10 @@ void QC_Graph::init_weightCoefficientMatrix()
 	for(_U32 len_id=0; len_id<length_search_num;len_id++) {
 		weightCoefficientMatrix[len_id].col_num = vector_col_num;
 		weightCoefficientMatrix[len_id].cycle_length = (len_id+2)*2;
+
+		char outFilename[100];
+		sprintf(outFilename, "weight_matrices/weightMatrix_%d.csv", weightCoefficientMatrix[len_id].cycle_length);
+		weightCoefficientMatrix[len_id].weightCoefficientMatrix_fd.open(outFilename);
 	}
 }
 
@@ -203,8 +207,7 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 			len_cnt = (vector_temp[col_id] != 0) ? len_cnt+abs(vector_temp[col_id]) : len_cnt;
 		}
 		
-		cout << "Matrix_row." << entry_id << "  len_cnt: " << len_cnt << endl;
-		weightCoefficientMatrix[(len_cnt/2)-2].showMatrix();
+
 		if(weightCoefficientMatrix[(len_cnt/2)-2].isExist_all(vector_temp) == false)
 			weightCoefficientMatrix[(len_cnt/2)-2].insert_vector(vector_temp, vector_col_num);
 		//cout << "Cycle.Candidate_" << entry_id << ", len_cnt:" << len_cnt << ", index: " << (len_cnt/2)-2 << endl;
@@ -429,14 +432,30 @@ void WeightCoefficientMatrix::mismatch_check_all()
 	*/
 }
 
-void WeightCoefficientMatrix::showMatrix()
+void WeightCoefficientMatrix::showMatrix(bool isFileOut)
 {
-	for(_U32 vec_id=0; vec_id<num; vec_id++) {
-		for(_U32 col_id=0; col_id<col_num; col_id++) {
-			cout << acc_voltage_vector[vec_id][col_id] << "\t";
+	if(isFileOut == true) {
+		for(_U32 vec_id=0; vec_id<num; vec_id++) {
+			for(_U32 col_id=0; col_id<col_num; col_id++) {
+				cout << acc_voltage_vector[vec_id][col_id] << "\t";
+
+				weightCoefficientMatrix_fd << acc_voltage_vector[vec_id][col_id];
+				if(col_id != col_num-1) 
+					weightCoefficientMatrix_fd << ",";
+			}
+			cout << endl;
+			weightCoefficientMatrix_fd << endl;
 		}
-		cout << endl;
+		cout << "======================" << endl;
 	}
-	cout << "======================"
-		 << endl;
+	else {
+		for(_U32 vec_id=0; vec_id<num; vec_id++) {
+			for(_U32 col_id=0; col_id<col_num; col_id++) {
+				cout << acc_voltage_vector[vec_id][col_id] << "\t";
+			}
+			cout << endl;
+		}
+		cout << "======================"
+			 << endl;
+	}
 }

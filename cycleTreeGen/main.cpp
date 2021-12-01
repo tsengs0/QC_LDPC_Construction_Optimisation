@@ -16,9 +16,10 @@ int main(int argc, char **argv)
 {
     int upperGirth = 8;
     string INPUT_FILENAME = "";
-    string OUTPUT_FILENAME = "out.txt";
+    string OUTPUT_FILENAME;
+    
     if(argc != 7) {
-    	cerr << "Usage:\ncycleTreeGen -file graphIn.txt -out out.txt(default) -upperGirth 8(default)\n";
+    	cerr << "Usage:\ncycleTreeGen -file graphIn.txt -out out(default) -upperGirth 8(default)\n";
    		exit(1);
     }
     
@@ -94,17 +95,16 @@ int main(int argc, char **argv)
 		 qc.build_weightCoefficientMatrix(var_node);
 	}
 
-	
 	for(_U32 len=1; len<qc.half_girth-1+1; len++) {
 		qc.weightCoefficientMatrix[len-1].remove_redundancy_all();
 		cout << "======================" <<endl;
 		cout << endl << "A(" << (len+1)*2 << "), Number of voltage vectors:"
 			 << qc.weightCoefficientMatrix[len-1].num << endl;
-		qc.weightCoefficientMatrix[len-1].showMatrix();
+
+		qc.weightCoefficientMatrix[len-1].showMatrix(true);
 	}
 
 	cout << endl << endl;
-
 	cout << endl;
 	return 0;
 }

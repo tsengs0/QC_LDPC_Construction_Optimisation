@@ -2,6 +2,8 @@
 #define __QC_GRAPH_H
 
 #include <vector>
+#include <fstream>
+#include <string>
 #include "graph.h"
 
 typedef unsigned int _U32;
@@ -64,6 +66,8 @@ class WeightCoefficientMatrix {
 		_U32 num;
 		_U32 col_num;
 		_U32 cycle_length;
+		std::ofstream weightCoefficientMatrix_fd;
+
 		std::vector< std::vector<int> > acc_voltage_vector;
 		WeightCoefficientMatrix();
 		void insert_vector(int *vec_in, _U32 vec_num);
@@ -74,7 +78,7 @@ class WeightCoefficientMatrix {
 		bool isExist_all(int *vec_in);
 		bool remove_redundancy(_U32 base_vector_id);
 		void remove_redundancy_all();
-		void showMatrix();
+		void showMatrix(bool isFileOut);
 };
 
 class QC_Graph {
@@ -87,7 +91,7 @@ class QC_Graph {
 		CycleCandidatePair_list *cycleCandidatePair_list;
 		WeightCoefficientMatrix *weightCoefficientMatrix;
 		
-		QC_Graph(_U32 target_girth_t, _U32 N_t, _U32 K_t, _U32 M_t, _U32 nonzero_num_t,_U32 lift_degree_t, Graph *base_graph_t);
+		QC_Graph(_U32 target_girth_t, _U32 N_t, _U32 K_t, _U32 M_t, _U32 nonzero_num_t, _U32 lift_degree_t, Graph *base_graph_t);
 		_U32 construct_cycleGenerate_tree(_U32 rootNode, TreeNode *curNode, _U32 prev_node, _U32 node_id, _U32 depth, _U32 traversedNode_cnt);
 		void assign_serialNumber(_U32 rootNode);
 		void traversal_cycleGenerate_tree(TreeNode *curNode, _U32 depth);
