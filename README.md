@@ -8,7 +8,7 @@
 
 ## Work to be done (latest update: 1 Dec., 2021) -> Implementation of QC-LDPC decoder based on layered decoding strategy using C++ with openMP+openMPI
 - [x] Implementation of node process units, e.g., min, sum and soft-information product.
-- [] Implementation of layered decoding scheduling schmeme.
+- [ ] Implementation of layered decoding scheduling schmeme.
 
 
 ## References
