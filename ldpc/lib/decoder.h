@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cmath>
+#include "channel.h"
 
 typedef float _V2C_Msg;
 typedef float _C2V_Msg;
@@ -28,6 +29,7 @@ class LDPC_Decoder {
 		uint32_t cnu_num; // the number of check node units
 		uint8_t *row_degree_vec;
 		uint8_t *col_degree_vec;
+		Channel_Wrapper *channel_block;
 
 		// Only used in QC-LDPC decoding system
 		BaseMatrix base_matrix;
@@ -46,6 +48,7 @@ class LDPC_Decoder {
 			uint8_t dc_num, 
 			uint8_t *dv_in, 
 			uint8_t dv_num,
+			uint16_t lift_degree_in,
 			bool isLayered
 		);
 
@@ -74,11 +77,13 @@ class LDPC_Decoder {
 		// Layered Decoding Mechanism
 		/*=====================================================*/
 		void liftDegree_preload(uint16_t *shiftVal_in);
-		void precompute_circulant_shift(uint8_t layer_id);
+		void precompute_circulant_shift();
+		void check_MemAddr();
 		void permuation_run(
-			uint8_t layer_id, ,
+			uint8_t layer_id,
 			uint32_t base_col_id,
 			_EXT_Msg *extrinsic_vec_in
 		);
+		void layered_scheduler(); // top module
 };
 #endif // __LDPC_DECODER_H

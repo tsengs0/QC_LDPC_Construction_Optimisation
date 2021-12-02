@@ -7,8 +7,11 @@ LDPC_Decoder::LDPC_Decoder(
 	uint8_t dc_num, 
 	uint8_t *dv_in, 
 	uint8_t dv_num,
+	uint16_t lift_degree_in,
 	bool isLayered
 ) {
+	vnu_num = vnu_num_in;
+	cnu_num = cnu_num_in;
 	row_degree_vec = new uint8_t[dc_num];
 	col_degree_vec = new uint8_t[dv_num];
 	memcpy(row_degree_vec, dc_in, dc_num);
@@ -18,22 +21,34 @@ LDPC_Decoder::LDPC_Decoder(
 		base_row_num = cnu_num;
 		base_col_num = vnu_num;
 		layer_num = base_row_num;
+		lift_degree = lift_degree_in;
 	
 		base_matrix.matrix = new uint8_t* [base_row_num];
 		base_matrix.circulantShift = new int32_t* [base_row_num];
+		std::cout << "base_row_num: " << base_row_num << ", base_col_num: " << base_col_num << std::endl;
 		for(uint32_t i=0; i<base_row_num; i++) {
 			base_matrix.matrix[i] = new uint8_t[base_col_num];
 			base_matrix.circulantShift[i] = new int32_t[base_col_num];
+
+			// For the regular QC code structure
+			for(uint32_t j=0; j< base_col_num; j++)
+				base_matrix.matrix[i][j]=1;
 		}
 
-		shift_patterns = uint16_t** [base_col_num];
+		shift_patterns = new uint16_t** [base_col_num];
 		layeredMEMs = new APP_MEM[base_col_num];
+		channel_block = new Channel_Wrapper[base_col_num];
 		for(uint32_t col=0; col<base_col_num; col++) {
 			shift_patterns[col] = new uint16_t* [layer_num];
 			layeredMEMs[col].layered_app_vec = new _LAYER_MEM_TYPE[lift_degree];
 			for(uint32_t l=0; l<layer_num; l++) 
 				shift_patterns[col][l] = new uint16_t[lift_degree];	
+
+			channel_block[col].init((unsigned int) AWGN_CH, (unsigned int) lift_degree);
 		}
+	}
+	else {
+		lift_degree = 1;
 	}
 }
 
@@ -162,17 +177,32 @@ void LDPC_Decoder::liftDegree_preload(uint16_t *shiftVal_in)
 	}
 }
 
-void LDPC_Decoder::precompute_circulant_shift(uint8_t layer_id)
+void LDPC_Decoder::precompute_circulant_shift()
 {
 	// Pre-compute the shifting patterns in a base-matrix wise
 	for(uint32_t col=0; col<base_col_num; col++) 
 		for(uint32_t l=0; l<layer_num; l++) 
 			for(uint32_t submatrix_col=0; submatrix_col<lift_degree; submatrix_col++)
-				shift_patterns[col][l][submatrix_col] = (uint16_t) ((submatrix_col+base_matrix.circulantShift) % lift_degree)
+				shift_patterns[col][l][submatrix_col] = (uint16_t) ((submatrix_col+base_matrix.circulantShift[l][col]) % (int32_t)lift_degree);
+}
+
+void LDPC_Decoder::check_MemAddr()
+{
+	for(uint32_t col=0; col<base_col_num; col++) {
+		std::cout << "==========================================================" << std::endl; 
+		std::cout << "Base-Matrix Column_" << col << std::endl;
+		for(uint32_t l=0; l<layer_num; l++) {
+			std::cout << "Layer_" << l << std::endl;
+			for(uint32_t submatrix_col=0; submatrix_col<lift_degree; submatrix_col++) {
+				std::cout << shift_patterns[col][l][submatrix_col] << ", ";
+			}
+			std::cout << std::endl;
+		}
+	}
 }
 
 void LDPC_Decoder::permuation_run(
-	uint8_t layer_id, ,
+	uint8_t layer_id,
 	uint32_t base_col_id,
 	_EXT_Msg *extrinsic_vec_in
 ) {
@@ -183,4 +213,24 @@ void LDPC_Decoder::permuation_run(
 		mem_addr = shift_patterns[col_temp][layer_id][submatrix_col];
 		layeredMEMs[col_temp].layered_app_vec[mem_addr] = extrinsic_vec_in[submatrix_col];
 	}
+}
+
+void LDPC_Decoder::layered_scheduler()
+{
+	// Pre-calculating all memory-write addresses for all layers
+	precompute_circulant_shift();
+
+	// a) Initially received the soft information from the underlying channel
+	// b) To simulate the encoding
+	// c) To simulate the transmission of encoded codeword over the configured Channel
+	// b) To calculate all channel LLRs
+	for(uint32_t col=0; col<base_col_num; col++) {
+		channel_block[col].bpsk_modulation();
+		channel_block[col].awgn_sim();
+		channel_block[col].llr_cal();
+		
+		channel_block[col].show_chMsg();
+	}
+
+	
 }
