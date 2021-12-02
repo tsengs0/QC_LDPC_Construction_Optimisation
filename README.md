@@ -1,10 +1,14 @@
 
 *A construction of QC-LDPC codes using Integer Linear Programming. It is an exercise mainly attempting to reproduce the work in [1] and [2]*
 
-## Work to be done (latest update: 30 Nov., 2021)
+## Work to be done (latest update: 30 Nov., 2021) -> Cycle Candidates Searching, and MILP based decision of all circulant shift values over nonzero elements of the considered base graph)  
 - [x] A BFS-like searching to generate Cycle Generating Tree for each base graph column [1].
 - [x] To summarise the Cycle Generating Trees to a) 3-tuple formed tables and b) cycle cnadidate-pairs matrices.
 - [x] To create the weighting coefficents matrices, i.e., A_{l} for all l <= g/2 and even. 
+
+## Work to be done (latest update: 1 Dec., 2021) -> Implementation of QC-LDPC decoder based on layered decoding strategy using C++ with openMP+openMPI
+- [x] Implementation of node process units, e.g., min, sum and soft-information product.
+- [] Implementation of layered decoding scheduling schmeme.
 
 
 ## References
