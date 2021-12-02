@@ -1,11 +1,40 @@
 #include "decoder.h"
 
-LDPC_Decoder::LDPC_Decoder(uint8_t *dc_in, uint8_t dc_num, uint8_t *dv_in, uint8_t dv_num)
-{
-	row_degree_type = new uint8_t[dc_num];
-	col_degree_type = new uint8_t[dv_num];
-	memcpy(row_degree_type, dc_in, dc_num);
-	memcpy(col_degree_type, dv_in, dv_num);
+LDPC_Decoder::LDPC_Decoder(
+	uint32_t vnu_num_in,
+	uint32_t cnu_num_in,
+	uint8_t *dc_in, 
+	uint8_t dc_num, 
+	uint8_t *dv_in, 
+	uint8_t dv_num,
+	bool isLayered
+) {
+	row_degree_vec = new uint8_t[dc_num];
+	col_degree_vec = new uint8_t[dv_num];
+	memcpy(row_degree_vec, dc_in, dc_num);
+	memcpy(col_degree_vec, dv_in, dv_num);
+
+	if(isLayered == true) {
+		base_row_num = cnu_num;
+		base_col_num = vnu_num;
+		layer_num = base_row_num;
+	
+		base_matrix.matrix = new uint8_t* [base_row_num];
+		base_matrix.circulantShift = new int32_t* [base_row_num];
+		for(uint32_t i=0; i<base_row_num; i++) {
+			base_matrix.matrix[i] = new uint8_t[base_col_num];
+			base_matrix.circulantShift[i] = new int32_t[base_col_num];
+		}
+
+		shift_patterns = uint16_t** [base_col_num];
+		layeredMEMs = new APP_MEM[base_col_num];
+		for(uint32_t col=0; col<base_col_num; col++) {
+			shift_patterns[col] = new uint16_t* [layer_num];
+			layeredMEMs[col].layered_app_vec = new _LAYER_MEM_TYPE[lift_degree];
+			for(uint32_t l=0; l<layer_num; l++) 
+				shift_patterns[col][l] = new uint16_t[lift_degree];	
+		}
+	}
 }
 
 void LDPC_Decoder::min(
@@ -116,36 +145,42 @@ uint8_t LDPC_Decoder::sum(
 
 	return hard_decision;
 }
-
-/*
-long double rand_normal(long double mean, long double stddev)
-{//Box muller method
-    static long double n2 = 0.0;
-    static int n2_cached = 0;
-    if (!n2_cached)
-    {
-        long double x, y, r;
-        do
-        {
-            x = 2.0*rand()/RAND_MAX - 1;
-            y = 2.0*rand()/RAND_MAX - 1;
-
-            r = x*x + y*y;
-        }
-        while (r == 0.0 || r > 1.0);
-        {
-            long double d = sqrt(-2.0*log(r)/r);
-            long double n1 = x*d;
-            n2 = y*d;
-            long double result = n1*stddev + mean;
-            n2_cached = 1;
-            return result;
-        }
-    }
-    else
-    {
-        n2_cached = 0;
-        return n2*stddev + mean;
-    }
+/*=====================================================*/
+// Layered Decoding Mechanism
+/*=====================================================*/
+void LDPC_Decoder::liftDegree_preload(uint16_t *shiftVal_in)
+{
+	uint32_t cnt; cnt=0;
+	for(uint32_t row_id=0; row_id<base_row_num; row_id++) {
+		for(uint32_t col_id=0; col_id<base_col_num; col_id++) {
+			if(base_matrix.matrix[row_id][col_id] == 1) {
+				base_matrix.circulantShift[row_id][col_id] = shiftVal_in[cnt];
+				cnt += 1;	
+			}
+			else base_matrix.circulantShift[row_id][col_id] = -1;
+		}
+	}
 }
-*/
+
+void LDPC_Decoder::precompute_circulant_shift(uint8_t layer_id)
+{
+	// Pre-compute the shifting patterns in a base-matrix wise
+	for(uint32_t col=0; col<base_col_num; col++) 
+		for(uint32_t l=0; l<layer_num; l++) 
+			for(uint32_t submatrix_col=0; submatrix_col<lift_degree; submatrix_col++)
+				shift_patterns[col][l][submatrix_col] = (uint16_t) ((submatrix_col+base_matrix.circulantShift) % lift_degree)
+}
+
+void LDPC_Decoder::permuation_run(
+	uint8_t layer_id, ,
+	uint32_t base_col_id,
+	_EXT_Msg *extrinsic_vec_in
+) {
+	uint16_t submatrix_col;
+	uint32_t col_temp; col_temp=base_col_id;
+	uint16_t mem_addr;
+	for(submatrix_col=0; submatrix_col<lift_degree; submatrix_col++) {
+		mem_addr = shift_patterns[col_temp][layer_id][submatrix_col];
+		layeredMEMs[col_temp].layered_app_vec[mem_addr] = extrinsic_vec_in[submatrix_col];
+	}
+}

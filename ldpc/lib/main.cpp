@@ -16,10 +16,13 @@ int main(int argc, char **argv)
 	uint8_t *dc = new uint8_t[1]; dc[0] = 10;
 	uint8_t *dv = new uint8_t[1]; dv[0] = 3;
 	LDPC_Decoder decoder(
+		10,  // vnu_num
+		3, // cnu_num
 		dc,
 		1,
 		dv,
-		1
+		1,
+		true // the underlying decoder is layered decoding system
 	);
 
 	_V2C_Msg **v2c_in; 
