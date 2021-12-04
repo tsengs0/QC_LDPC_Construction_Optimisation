@@ -1,0 +1,2 @@
+Execution time to search for all cycle candidates of which path length is less than the expected GIRTH:
+147122.782u 140.953s 41:00:16.27 99.7%	0+0k 1528+1104io 78pf+0w

@@ -185,7 +185,7 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 		// Backtracking from ji
 		long long entry_ptr_ji; entry_ptr_ji = ji;
 		while(entry_ptr_ji != -1) {
-			//cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].v << "->";
+			cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].v << "->";
 			// voltage_index starts from 1 in order to avoid confusion of +0 and -0
 			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_ji].e;
 			vector_temp[abs(vol_t)-1] += (vol_t/abs(vol_t));
@@ -195,7 +195,7 @@ void QC_Graph::build_weightCoefficientMatrix(_U32 rootNode)
 		// Backtracking from jh
 		long long entry_ptr_jh = jh;
 		while(!(entry_ptr_jh == -1 || entry_ptr_ji == entry_ptr_jh)) {
-			//cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].v << "->";
+			cout << cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].v << "->";
 			// voltage_index starts from 1 in order to avoid confusion of +0 and -0
 			int vol_t; vol_t = cycleTree_3tuple_table[rootNode].tuple_3[entry_ptr_jh].e;
 			vector_temp[abs(vol_t)-1] -= (vol_t/abs(vol_t));

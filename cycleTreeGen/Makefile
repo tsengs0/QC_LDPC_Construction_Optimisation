@@ -28,10 +28,10 @@ $(EXE_NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 run:
-	./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 10
+	./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 8
 
 debug:
-	gdb ./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 10
+	gdb ./$(EXE_NAME) -file graphIn.txt -out out.txt -upperGirth 8
 
 clean: 
 	rm -f $(REBUILDABLES) *.dep *.deppo *~ *.o *.txt circular_page_align*_lib.v page_align*_lib.v log submatrix*.mem
