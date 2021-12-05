@@ -2,7 +2,7 @@
 
 extern uint8_t ITER_MAX;
 extern uint8_t BP_MS_NMS;
-#define ALPHA 0.7
+#define ALPHA 0.6
 uint32_t global_col;
 LDPC_Decoder::LDPC_Decoder(
 	uint32_t vnu_num_in,
@@ -504,7 +504,6 @@ void LDPC_Decoder::layered_offset_min(uint8_t layer_id, uint16_t submatrix_col)
 	_V2C_Msg min_0, min_1;
 	uint8_t *min_index = new uint8_t[2];
 	uint8_t i;
-
 	// Take the absolute values
 	_V2C_Msg *abs_v2c_in = new _V2C_Msg[row_degree_vec[0]];
 	int8_t common_sign; common_sign = 0;
@@ -542,7 +541,7 @@ void LDPC_Decoder::layered_offset_min(uint8_t layer_id, uint16_t submatrix_col)
 	min_0 -= 1.0; min_1 -= 1.0;
 	min_0 = (min_0 > 0.0) ? min_0 : 0.0;
 	min_1 = (min_1 > 0.0) ? min_0 : 0.0;
-
+	
 	// Allocate the values to each corresponding check-to-variable messages' memory region
 	for(i=0; i<row_degree_vec[0]; i++) {
 		// 0 -> 1
@@ -584,5 +583,6 @@ void LDPC_Decoder::layered_softProduct(uint8_t layer_id, uint16_t submatrix_col)
 		val_1 = 1.0-val_0;
 		val_0 += 1.0;
 		layeredMEMs[i].c2v_cache[layer_id][ shift_patterns[i][layer_id][submatrix_col] ] = log(val_0 / val_1);
+		//std::cout << "\t\t\tcnuOut -> " << log(val_0/val_1) << std::endl; 
 	}
 }
