@@ -11,9 +11,9 @@
 - [x] Implementation of layered decoding scheduling schmeme.
 
 ## Plan of QC-LDPC codes evaluation
-- [ ] Evluation of base graph based on the C1 in [3], only Sum-Product decoding is taken into account -> to compare the BERs of girth-4, girth-6, girth-8 and girth-10
-- [ ] Evaluation of base graph based on the MacKay[4] and [6]. The (N=504,R=0.5, P=84) and (N=1008, R=0.5, P=84) are targeted.
-- [ ] Evaluation of IEEE-802.16e (WiMax) standard code based on the [5]. The code structure is: (N=2304, R=0.5, Z=96) of G=V_a union V_b where |V_a|=12 and |V_b|=24.
+- [X] Evluation of base graph based on the C1 in [3], only Sum-Product decoding is taken into account -> to compare the BERs of girth-4, girth-6, girth-8 and girth-10
+- [X] Evaluation of base graph based on the MacKay[4] and [6]. The (N=504,R=0.5, P=84) and (N=1008, R=0.5, P=84) are targeted.
+- [X] Evaluation of IEEE-802.16e (WiMax) standard code based on the [5]. The code structure is: (N=2304, R=0.5, Z=96) of G=V_a union V_b where |V_a|=12 and |V_b|=24.
 
 ## References
 [1] Bocharova, Irina E., Boris D. Kudryashov, and Rolf Johannesson. "Searching for binary and nonbinary block and convolutional LDPC codes." IEEE Transactions on Information Theory 62.1 (2015): 163-183.\
