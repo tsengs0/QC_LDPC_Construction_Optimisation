@@ -1,0 +1,6 @@
+girth = 8	122400 cycles
+EMD	Number
+32	122400
+girth = 10	412335 cycles
+EMD	Number
+40	412335

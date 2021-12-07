@@ -1,0 +1,3 @@
+girth = 10	133110 cycles
+EMD	Number
+5	133110

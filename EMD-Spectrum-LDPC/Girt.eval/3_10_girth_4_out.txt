@@ -1,0 +1,9 @@
+girth = 4	103275 cycles
+EMD	Number
+0	103275
+girth = 6	550800 cycles
+EMD	Number
+0	550800
+girth = 8	11308995 cycles
+EMD	Number
+0	11308995
